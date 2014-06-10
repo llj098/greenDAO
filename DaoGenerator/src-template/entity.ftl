@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<#assign toBindType = {"Boolean":"Long", "Byte":"Long", "Short":"Long", "Int":"Long", "Long":"Long", "Float":"Double", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
-<#assign toCursorType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
+<#assign toBindType = {"Boolean":"Long", "Byte":"Long", "Short":"Long", "Int":"Long", "Long":"Long", "Enum":"Long", "Float":"Double", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
+<#assign toCursorType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Enum":"Int", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
 <#assign complexTypes = ["String", "ByteArray", "Date"]/>
 package ${entity.javaPackage};
 
@@ -57,6 +57,32 @@ as ifc>${ifc}<#if ifc_has_next>, </#if></#list></#if> {
     /** Not-null value. */
 </#if>
     private ${property.javaType} ${property.propertyName};
+    
+<#if property.propertyType == "Enum">
+   	public enum ${property.enumTypeName} {   	
+   		<#list property.enumMap?keys as k>${k}(${ property.enumMap[k] })<#if 
+   		k_index == property.enumMap?size -1>;<#else>,</#if></#list>
+   		
+   		private final int value;
+		private ${property.enumTypeName} (int value) {
+			this.value = value;
+		}
+    	public int getValue() {
+    		return value;
+    	}
+    	
+    	public static ${property.javaType} valueOf(int value) {
+    		switch(value) {
+    			<#list property.enumMap?keys as k>
+    			case ${ property.enumMap[k] }:
+    				return ${k};	
+    			</#list>
+   				default:
+   					return null;
+   			}
+    	}
+    }
+</#if>
 </#list>
 
 <#if entity.active>

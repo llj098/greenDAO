@@ -126,6 +126,10 @@ public class Entity {
         return addProperty(PropertyType.Date, propertyName);
     }
 
+    public PropertyBuilder addEnumProperty(String propertyName) {
+    	return addProperty(PropertyType.Enum, propertyName);
+    }
+    
     public PropertyBuilder addProperty(PropertyType propertyType, String propertyName) {
         if (!propertyNames.add(propertyName)) {
             throw new RuntimeException("Property already defined: " + propertyName);
