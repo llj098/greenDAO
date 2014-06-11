@@ -62,6 +62,7 @@ public class NoteActivity extends ListActivity {
         String textColumn = NoteDao.Properties.Text.columnName;
         String orderBy = textColumn + " COLLATE LOCALIZED ASC";
         cursor = db.query(noteDao.getTablename(), noteDao.getAllColumns(), null, null, null, null, orderBy);
+        
         String[] from = { textColumn, NoteDao.Properties.Comment.columnName };
         int[] to = { android.R.id.text1, android.R.id.text2 };
 

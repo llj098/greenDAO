@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import de.greenrobot.dao.DaoLog;
 
@@ -43,9 +44,9 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
     private static final UriMatcher sURIMatcher;
 
     static {
-    sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    sURIMatcher.addURI(AUTHORITY, BASE_PATH, ${entity.className?upper_case}_DIR);
-    sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", ${entity.className?upper_case}_ID);
+	    sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+	    sURIMatcher.addURI(AUTHORITY, BASE_PATH, ${entity.className?upper_case}_DIR);
+	    sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", ${entity.className?upper_case}_ID);
     }
 
     /**
@@ -56,18 +57,18 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
 
     @Override
     public boolean onCreate() {
-    // if(daoSession == null) {
-    // throw new IllegalStateException("DaoSession must be set before content provider is created");
-    // }
-    DaoLog.d("Content Provider started: " + CONTENT_URI);
-    return true;
+	    // if(daoSession == null) {
+	    // throw new IllegalStateException("DaoSession must be set before content provider is created");
+	    // }
+	    DaoLog.d("Content Provider started: " + CONTENT_URI);
+	    return true;
     }
 
     protected SQLiteDatabase getDatabase() {
-    if(daoSession == null) {
-    throw new IllegalStateException("DaoSession must be set during content provider is active");
-    }
-    return daoSession.getDatabase();
+	    if(daoSession == null) {
+	    throw new IllegalStateException("DaoSession must be set during content provider is active");
+	    }
+	    return daoSession.getDatabase();
     }
 
 <#--
@@ -78,21 +79,21 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
     @Override
     public Uri insert(Uri uri, ContentValues values) {
 <#if contentProvider.isReadOnly()>
-    throw new UnsupportedOperationException("This content provider is readonly");
+    	throw new UnsupportedOperationException("This content provider is readonly");
 <#else>
-    int uriType = sURIMatcher.match(uri);
-    long id = 0;
-    String path = "";
-    switch (uriType) {
-    case ${entity.className?upper_case}_DIR:
-    id = getDatabase().insert(TABLENAME, null, values);
-    path = BASE_PATH + "/" + id;
-    break;
-    default:
-    throw new IllegalArgumentException("Unknown URI: " + uri);
-    }
-    getContext().getContentResolver().notifyChange(uri, null);
-    return Uri.parse(path);
+	    int uriType = sURIMatcher.match(uri);
+	    long id = 0;
+	    String path = "";
+	    switch (uriType) {
+	    	case ${entity.className?upper_case}_DIR:
+			    id = getDatabase().insert(TABLENAME, null, values);
+			    path = BASE_PATH + "/" + id;
+			    break;
+	    	default:
+	    		throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	    getContext().getContentResolver().notifyChange(uri, null);
+	    return Uri.parse(path);
 </#if>
     }
 
@@ -104,30 +105,30 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
 <#if contentProvider.isReadOnly()>
-    throw new UnsupportedOperationException("This content provider is readonly");
+    	throw new UnsupportedOperationException("This content provider is readonly");
 <#else>
-    int uriType = sURIMatcher.match(uri);
-    SQLiteDatabase db = getDatabase();
-    int rowsDeleted = 0;
-    String id;
-    switch (uriType) {
-    case ${entity.className?upper_case}_DIR:
-    rowsDeleted = db.delete(TABLENAME, selection, selectionArgs);
-    break;
-    case ${entity.className?upper_case}_ID:
-    id = uri.getLastPathSegment();
-    if (TextUtils.isEmpty(selection)) {
-    rowsDeleted = db.delete(TABLENAME, PK + "=" + id, null);
-    } else {
-    rowsDeleted = db.delete(TABLENAME, PK + "=" + id + " and "
-    + selection, selectionArgs);
-    }
-    break;
-    default:
-    throw new IllegalArgumentException("Unknown URI: " + uri);
-    }
-    getContext().getContentResolver().notifyChange(uri, null);
-    return rowsDeleted;
+	    int uriType = sURIMatcher.match(uri);
+	    SQLiteDatabase db = getDatabase();
+	    int rowsDeleted = 0;
+	    String id;
+	    switch (uriType) {
+	    	case ${entity.className?upper_case}_DIR:
+	    		rowsDeleted = db.delete(TABLENAME, selection, selectionArgs);
+	    		break;
+	    	case ${entity.className?upper_case}_ID:
+			    id = uri.getLastPathSegment();
+			    if (TextUtils.isEmpty(selection)) {
+			    	rowsDeleted = db.delete(TABLENAME, PK + "=" + id, null);
+			    } else {
+			    	rowsDeleted = db.delete(TABLENAME, PK + "=" + id + " and "
+			    		+ selection, selectionArgs);
+			    }
+			    break;
+	    	default:
+	    		throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	    getContext().getContentResolver().notifyChange(uri, null);
+	    return rowsDeleted;
 </#if>
     }
 
@@ -140,30 +141,30 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
     public int update(Uri uri, ContentValues values, String selection,
     String[] selectionArgs) {
 <#if contentProvider.isReadOnly()>
-    throw new UnsupportedOperationException("This content provider is readonly");
+	    throw new UnsupportedOperationException("This content provider is readonly");
 <#else>
-    int uriType = sURIMatcher.match(uri);
-    SQLiteDatabase db = getDatabase();
-    int rowsUpdated = 0;
-    String id;
-    switch (uriType) {
-    case ${entity.className?upper_case}_DIR:
-    rowsUpdated = db.update(TABLENAME, values, selection, selectionArgs);
-    break;
-    case ${entity.className?upper_case}_ID:
-    id = uri.getLastPathSegment();
-    if (TextUtils.isEmpty(selection)) {
-    rowsUpdated = db.update(TABLENAME, values, PK + "=" + id, null);
-    } else {
-    rowsUpdated = db.update(TABLENAME, values, PK + "=" + id
-    + " and " + selection, selectionArgs);
-    }
-    break;
-    default:
-    throw new IllegalArgumentException("Unknown URI: " + uri);
-    }
-    getContext().getContentResolver().notifyChange(uri, null);
-    return rowsUpdated;
+	    int uriType = sURIMatcher.match(uri);
+	    SQLiteDatabase db = getDatabase();
+	    int rowsUpdated = 0;
+	    String id;
+	    switch (uriType) {
+		    case ${entity.className?upper_case}_DIR:
+		    	rowsUpdated = db.update(TABLENAME, values, selection, selectionArgs);
+		    	break;
+		    case ${entity.className?upper_case}_ID:
+		    	id = uri.getLastPathSegment();
+		    	if (TextUtils.isEmpty(selection)) {
+		    		rowsUpdated = db.update(TABLENAME, values, PK + "=" + id, null);
+		    	} else {
+		    		rowsUpdated = db.update(TABLENAME, values, PK + "=" + id
+		    			+ " and " + selection, selectionArgs);
+		    	}
+		    	break;
+		    default:
+		    	throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	    getContext().getContentResolver().notifyChange(uri, null);
+	    return rowsUpdated;
 </#if>
     }
 <#--
@@ -175,27 +176,27 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
     public Cursor query(Uri uri, String[] projection, String selection,
     String[] selectionArgs, String sortOrder) {
 
-    SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-    int uriType = sURIMatcher.match(uri);
-    switch (uriType) {
-    case ${entity.className?upper_case}_DIR:
-    queryBuilder.setTables(TABLENAME);
-    break;
-    case ${entity.className?upper_case}_ID:
-    queryBuilder.setTables(TABLENAME);
-    queryBuilder.appendWhere(PK + "="
-    + uri.getLastPathSegment());
-    break;
-    default:
-    throw new IllegalArgumentException("Unknown URI: " + uri);
-    }
-
-    SQLiteDatabase db = getDatabase();
-    Cursor cursor = queryBuilder.query(db, projection, selection,
-    selectionArgs, null, null, sortOrder);
-    cursor.setNotificationUri(getContext().getContentResolver(), uri);
-
-    return cursor;
+	    SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+	    int uriType = sURIMatcher.match(uri);
+	    switch (uriType) {
+		    case ${entity.className?upper_case}_DIR:
+		    	queryBuilder.setTables(TABLENAME);
+		    	break;
+		    case ${entity.className?upper_case}_ID:
+		    	queryBuilder.setTables(TABLENAME);
+		    	queryBuilder.appendWhere(PK + "="
+		    		+ uri.getLastPathSegment());
+		    	break;
+		    default:
+		    	throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	
+	    SQLiteDatabase db = getDatabase();
+	    Cursor cursor = queryBuilder.query(db, projection, selection,
+	    selectionArgs, null, null, sortOrder);
+	    cursor.setNotificationUri(getContext().getContentResolver(), uri);
+	
+	    return cursor;
     }
 
 <#--
@@ -205,13 +206,13 @@ import ${entity.javaPackageDao}.${entity.classNameDao};
 -->
     @Override
     public final String getType(Uri uri) {
-    switch (sURIMatcher.match(uri)) {
-    case ${entity.className?upper_case}_DIR:
-    return CONTENT_TYPE;
-    case ${entity.className?upper_case}_ID:
-    return CONTENT_ITEM_TYPE;
-    default :
-    throw new IllegalArgumentException("Unsupported URI: " + uri);
-    }
-    }
+	    switch (sURIMatcher.match(uri)) {
+		    case ${entity.className?upper_case}_DIR:
+		    	return CONTENT_TYPE;
+		    case ${entity.className?upper_case}_ID:
+		    	return CONTENT_ITEM_TYPE;
+		    default :
+		    	throw new IllegalArgumentException("Unsupported URI: " + uri);
+		    }
+	    }
     }

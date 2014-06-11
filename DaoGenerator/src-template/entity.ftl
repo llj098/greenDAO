@@ -59,6 +59,7 @@ as ifc>${ifc}<#if ifc_has_next>, </#if></#list></#if> {
     private ${property.javaType} ${property.propertyName};
     
 <#if property.propertyType == "Enum">
+	<#if entity.className == property.className >
    	public enum ${property.enumTypeName} {   	
    		<#list property.enumMap?keys as k>${k}(${ property.enumMap[k] })<#if 
    		k_index == property.enumMap?size -1>;<#else>,</#if></#list>
@@ -82,6 +83,7 @@ as ifc>${ifc}<#if ifc_has_next>, </#if></#list></#if> {
    			}
     	}
     }
+    </#if>
 </#if>
 </#list>
 

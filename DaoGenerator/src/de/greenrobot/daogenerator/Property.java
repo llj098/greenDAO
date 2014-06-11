@@ -128,8 +128,8 @@ public class Property {
 	private final Schema schema;
 	private final Entity entity;
 	private PropertyType propertyType;
-	private final String propertyName;
-
+	
+	private String propertyName;
 	private String columnName;
 	private String columnType;
 
@@ -146,6 +146,7 @@ public class Property {
 
 	private int ordinal;
 	private String enumTypeName;
+	private String className;
 	private String javaType;
 
 	public Property(Schema schema, Entity entity, PropertyType propertyType,
@@ -154,6 +155,7 @@ public class Property {
 		this.entity = entity;
 		this.propertyName = uncapFirst(propertyName);
 		this.propertyType = propertyType;
+		this.className = entity.getClassName();
 	}
 
 	public static String capFirst(String str) {
@@ -178,6 +180,10 @@ public class Property {
 		this.propertyType = propertyType;
 	}
 
+	void setPropertyName(String name) {
+		this.propertyName = uncapFirst(name);
+	}
+	
 	public String getColumnName() {
 		return columnName;
 	}
@@ -214,6 +220,10 @@ public class Property {
 		return enumTypeName;
 	}
 	
+	public String getClassName() {
+		return className;
+	}
+
 	public int getOrdinal() {
 		return ordinal;
 	}
@@ -231,25 +241,34 @@ public class Property {
 	}
 
 	void init2ndPass() {
-        initConstraint();
-        if (columnType == null) {
-            columnType = schema.mapToDbType(propertyType);
-        }
-        if (columnName == null) {
-            columnName = DaoUtil.dbName(propertyName);
-        }
-        if(propertyType == PropertyType.Enum) {
-        	enumTypeName = capFirst(propertyName);
-        	javaType = schema.getDefaultJavaPackage() +"." + 
-        			entity.getClassName() + "." + enumTypeName;
-        	return;
-        }
-        if (notNull) {
-            javaType = schema.mapToJavaTypeNotNull(propertyType);
-        } else {
-            javaType = schema.mapToJavaTypeNullable(propertyType);
-        }
-    }
+		initConstraint();
+		if (columnType == null) {
+			columnType = schema.mapToDbType(propertyType);
+		}
+		if (columnName == null) {
+			columnName = DaoUtil.dbName(propertyName);
+		}
+		
+		if (propertyType == PropertyType.Enum) {
+			enumTypeName = capFirst(propertyName);
+			
+			if (schema.getDefaultJavaPackage() != null
+					&& !schema.getDefaultJavaPackage().trim().equals("")) {
+				javaType = schema.getDefaultJavaPackage() + ".";
+			}
+			else { 
+				javaType = ""; 
+			}
+			javaType = javaType + entity.getClassName() + "." + enumTypeName;
+			return;
+		}
+		
+		if (notNull) {
+			javaType = schema.mapToJavaTypeNotNull(propertyType);
+		} else {
+			javaType = schema.mapToJavaTypeNullable(propertyType);
+		}
+	}
 
 	private void initConstraint() {
 		StringBuilder constraintBuilder = new StringBuilder();
@@ -282,6 +301,13 @@ public class Property {
 
 	void init3ndPass() {
 		// Nothing to do so far
+	}
+	
+	public Property clone() {
+		Property prop = new Property(schema, entity, propertyType, propertyName);
+		prop.init2ndPass();
+		prop.init3ndPass();
+		return prop;
 	}
 
 	@Override

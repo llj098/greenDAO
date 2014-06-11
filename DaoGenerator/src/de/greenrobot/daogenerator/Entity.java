@@ -130,6 +130,15 @@ public class Entity {
     	return addProperty(PropertyType.Enum, propertyName);
     }
     
+    public void addEnumProperty(String name, Property prop) {
+    	if (!propertyNames.add(name)) {
+            throw new RuntimeException("Property already defined: " + name);
+        }
+    	Property np = prop.clone();
+    	prop.setPropertyName(name);
+    	properties.add(prop);
+    }
+    
     public PropertyBuilder addProperty(PropertyType propertyType, String propertyName) {
         if (!propertyNames.add(propertyName)) {
             throw new RuntimeException("Property already defined: " + propertyName);

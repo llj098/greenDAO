@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.ArrayList;
 </#if>
 import android.database.Cursor;
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
@@ -237,6 +238,20 @@ as property>${property.columnName}<#if property_has_next>,</#if></#list>);");
             property.propertyType == "Enum">)</#if>);
 </#list>
 </#if>
+     }
+     
+     public ContentValues toContentValues(${entity.className} entity) {
+<#if entity.protobuf>
+        throw new UnsupportedOperationException("Protobuf objects cannot be modified");
+<#else>
+		ContentValues cv = new ContentValues(); 
+<#list entity.properties as property>
+		cv.put("${property.columnName}" , entity.get${property.propertyName?cap_first}()<#if
+            property.propertyType == "Enum">.getValue()<#elseif 
+            property.propertyType == "Date">.getTime()</#if>);
+</#list>
+		return cv;
+</#if>     
      }
     
     /** @inheritdoc */
