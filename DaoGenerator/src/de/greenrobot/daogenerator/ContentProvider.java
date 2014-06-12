@@ -14,6 +14,7 @@ public class ContentProvider {
     public ContentProvider(Schema schema, List<Entity> entities) {
         this.schema = schema;
         this.entities = entities;
+        basePath = "defaultBasePath";
     }
 
     public String getAuthority() {

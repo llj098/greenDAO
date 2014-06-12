@@ -75,6 +75,8 @@ public class ${entity.classNameDao} extends AbstractDao<${entity.className}, ${e
         public final static Property ${property.propertyName?cap_first} = new Property(${property_index}, ${property.javaType}.class, "${property.propertyName}", ${property.primaryKey?string}, "${property.columnName}");
 </#list>
     };
+    
+   	public static final String[] columns = {<#list entity.propertiesColumns as property>"${property.columnName}",</#list>}; 
 
 <#if entity.active>
     private DaoSession daoSession;
